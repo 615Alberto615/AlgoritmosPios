@@ -15,7 +15,6 @@ import 'ayudasort.dart';
 import 'dij.dart';
 import 'figuras.dart';
 import 'jh.dart';
-import 'kruskal.dart';
 import 'matriz.dart';
 import 'modelos.dart';
 
@@ -46,7 +45,7 @@ class Home5 extends StatefulWidget {
   State<Home5> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home5> {
+class _HomeState extends State<Home5> with TickerProviderStateMixin {
   final nuevoNodo = TextEditingController();
   final stopwatch = Stopwatch();
   int modo = -1;
@@ -62,22 +61,77 @@ class _HomeState extends State<Home5> {
   final numerosController = TextEditingController();
   late AnimationController _controller;
   late AnimatedListState _listState;
-
+  Duration elapsed = Duration();
+  bool isPlaying = false;
+  bool isPaused = false;
+  int elapsedSeconds = 0;
+  String sortTitle = '';
   @override
+  void _startTimer() {
+    setState(() {
+      isPlaying = true;
+      elapsedSeconds = 0;
+      Timer.periodic(Duration(seconds: 1), (timer) {
+        setState(() {
+          elapsedSeconds++;
+        });
+        if (!isPlaying) {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
   void _selectionSort() async {
+    setState(() {
+      isPlaying = true;
+      isPaused = false;
+    });
     sortNumeros = await SelectionSort.sort(List.from(numeros), setState);
+    sortTitle = 'Selection Sort';
+    setState(() {
+      isPlaying = false;
+      isPaused = true;
+    });
   }
 
   void _insertionSort() async {
+    setState(() {
+      isPlaying = true;
+      isPaused = false;
+    });
     sortNumeros = await InsertionSort.sort(List.from(numeros), setState);
+    sortTitle = 'Insertion Sort';
+    setState(() {
+      isPlaying = false;
+      isPaused = true;
+    });
   }
 
   void _margeSort() async {
+    setState(() {
+      isPlaying = true;
+      isPaused = false;
+    });
     sortNumeros = await MergeSort.sort(List.from(numeros), setState);
+    sortTitle = 'Merge Sort';
+    setState(() {
+      isPlaying = false;
+      isPaused = true;
+    });
   }
 
   void _shellSort() async {
+    setState(() {
+      isPaused = false;
+      isPlaying = true;
+    });
     sortNumeros = await ShellSort.sort(List.from(numeros), setState);
+    sortTitle = 'Shell Sort';
+    setState(() {
+      isPlaying = false;
+      isPaused = true;
+    });
   }
 
   void _showDialog(BuildContext context) {
@@ -162,7 +216,6 @@ class _HomeState extends State<Home5> {
                       'Arboles',
                       'Compet',
                       'Dijkstra',
-                      'Kruskal',
                       'Reset',
                     ];
                     return AlertDialog(
@@ -240,15 +293,6 @@ class _HomeState extends State<Home5> {
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => Home9()),
-                                      (Route<dynamic> route) => false,
-                                    );
-                                    break;
-
-                                  case 8:
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
                                           builder: (context) => Home()),
                                       (Route<dynamic> route) => false,
                                     );
@@ -308,8 +352,41 @@ class _HomeState extends State<Home5> {
                             RandomNumberGenerator.generar(int.parse(value));
                       });
                     },
-                  )
+                  ),
                 ],
+              ),
+            ),
+            Positioned(
+              top: 20,
+              left: 40,
+              child: Text(
+                sortTitle,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            //if (isPlaying)
+            Positioned(
+              top: 30,
+              right: 30,
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  isPlaying
+                      ? 'Tiempo: $elapsedSeconds s'
+                      : 'Tiempo: $elapsedSeconds',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
               ),
             ),
             Container(
@@ -376,30 +453,40 @@ class _HomeState extends State<Home5> {
               Row(
                 children: [
                   IconButton(
-                      icon: Icon(Icons.select_all_sharp),
-                      tooltip: 'Selection Sort',
-                      color: modo == 1 ? Colors.green.shade300 : Colors.white,
-                      onPressed: _selectionSort),
-                  IconButton(
-                    icon: Icon(Icons.insert_page_break_sharp),
-                    tooltip: 'Insertion Sort',
-                    color: modo == 3 ? Colors.green.shade300 : Colors.white,
-                    onPressed: _insertionSort,
+                    icon: Icon(Icons.select_all_sharp),
+                    tooltip: 'Selection Sort',
+                    color: modo == 1 ? Colors.green.shade300 : Colors.white,
+                    onPressed: (() {
+                      _selectionSort();
+                      _startTimer();
+                    }),
                   ),
                   IconButton(
-                    icon: Icon(Icons.merge_type_sharp),
-                    // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
-                    tooltip: 'Merge Sort',
-                    color: modo == 4 ? Colors.green.shade300 : Colors.white,
-                    onPressed: _margeSort,
-                  ),
+                      icon: Icon(Icons.insert_page_break_sharp),
+                      tooltip: 'Insertion Sort',
+                      color: modo == 3 ? Colors.green.shade300 : Colors.white,
+                      onPressed: (() {
+                        _insertionSort();
+                        _startTimer();
+                      })),
                   IconButton(
-                    icon: Icon(Icons.shield_moon),
-                    // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
-                    tooltip: 'Shell Sort',
-                    color: modo == 5 ? Colors.green.shade300 : Colors.white,
-                    onPressed: _shellSort,
-                  ),
+                      icon: Icon(Icons.merge_type_sharp),
+                      // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
+                      tooltip: 'Merge Sort',
+                      color: modo == 4 ? Colors.green.shade300 : Colors.white,
+                      onPressed: (() {
+                        _margeSort();
+                        _startTimer();
+                      })),
+                  IconButton(
+                      icon: Icon(Icons.shield_moon),
+                      // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
+                      tooltip: 'Shell Sort',
+                      color: modo == 5 ? Colors.green.shade300 : Colors.white,
+                      onPressed: (() {
+                        _shellSort();
+                        _startTimer();
+                      })),
                   IconButton(
                     icon: Icon(Icons.layers_clear_sharp),
                     tooltip: 'Limpiar',
