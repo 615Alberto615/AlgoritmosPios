@@ -18,6 +18,8 @@ import 'nw.dart';
 import 'dij.dart';
 
 int peso = 0;
+List<int> preorder = [0];
+List<int> postorder = [0];
 
 class Home6 extends StatefulWidget {
   const Home6({Key? key}) : super(key: key);
@@ -202,6 +204,8 @@ class _Home7State extends State<Home6> {
                 size: Size(MediaQuery.of(context).size.width, 250),
               ),
             ),
+            Vector(),
+            Order(),
           ],
         ),
         bottomNavigationBar: BottomAppBar(
@@ -219,6 +223,10 @@ class _Home7State extends State<Home6> {
                       setState(() {
                         _dato = peso;
                         objArbol.insertarNodo(_dato);
+                        preorder.add(_dato);
+                        postorder.add(_dato);
+                        Vector();
+                        Order();
                       });
                     },
                   ),
@@ -227,7 +235,12 @@ class _Home7State extends State<Home6> {
                     tooltip: 'Ayuda',
                     color: Colors.green.shade300,
                     onPressed: () {
-                      setState(() {});
+                      setState(() {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AyudaArbol()));
+                      });
                     },
                   ),
                   IconButton(
@@ -237,6 +250,10 @@ class _Home7State extends State<Home6> {
                     onPressed: () {
                       setState(() {
                         objArbol.resetArbol();
+                        preorder = [0];
+                        postorder = [0];
+                        Vector();
+                        Order();
                       });
                     },
                   ),
@@ -248,6 +265,45 @@ class _Home7State extends State<Home6> {
       ),
     );
   }
+}
+
+Widget Vector() {
+  return Container(
+    margin: EdgeInsets.only(top: 600),
+    child: Column(
+      children: [
+        Text("Pre Orden"),
+        Table(border: TableBorder.all(), children: [
+          TableRow(children: [
+            for (var i = 0; i < preorder.length; i++)
+              TableCell(
+                child: Text(preorder[i].toString()),
+              ),
+          ])
+        ]),
+      ],
+    ),
+  );
+}
+
+Widget Order() {
+  postorder.sort();
+  return Container(
+    margin: EdgeInsets.only(top: 630),
+    child: Column(
+      children: [
+        Text("Post Orden"),
+        Table(border: TableBorder.all(), children: [
+          TableRow(children: [
+            for (var i = 0; i < postorder.length; i++)
+              TableCell(
+                child: Text(postorder[i].toString()),
+              ),
+          ])
+        ]),
+      ],
+    ),
+  );
 }
 
 Widget Peso() => TextField(
