@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:file_picker/_internal/file_picker_web.dart';
 import 'package:flutter/material.dart';
 import 'package:gf12/asignacion.dart';
+import 'package:gf12/centroide.dart';
 import 'package:gf12/nw.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -47,6 +48,7 @@ class Home7 extends StatefulWidget {
 }
 
 class _HomeState extends State<Home7> {
+  List<double> centroide = []; // Variable para almacenar las coordenadas del centroide
   final nuevoNodo = TextEditingController();
   int modo = -1;
   int numNodo = 1;
@@ -56,6 +58,7 @@ class _HomeState extends State<Home7> {
   ModeloNodo nodoinicio = ModeloNodo(-1, -1, 0, "-1", -1);
   List<ModeloNodo> vNodo = [];
   List<ModeloLine> vLinea = [];
+  List<List<double>> data = [];
 
   @override
   Widget build(BuildContext context) {
@@ -386,8 +389,24 @@ class _HomeState extends State<Home7> {
                             }
                           }
                         }
+                      } else{
+                        if (modo == 9) {
+                            // Modo 9: Dibujar nodo del centroide
+                            calcularCentroide();
+                            if (centroide.isNotEmpty) {
+                              vNodo.add(ModeloNodo(
+                                centroide[0],
+                                centroide[1],
+                                35,
+                                'Centroide',
+                                keynodo));
+                              numNodo++;
+                              keynodo++;
+                              print(centroide[0]);
+                            }
+                          }
                       }
-                    }
+                    } 
                   }
                 });
               },
@@ -466,6 +485,21 @@ class _HomeState extends State<Home7> {
                       if (modo == 500) {}
                     }
                   }
+                  if (modo == 9) {
+                    // Modo 9: Dibujar nodo del centroide
+                    calcularCentroide();
+                    if (centroide.isNotEmpty) {
+                      vNodo.add(ModeloNodo(
+                        centroide[0],
+                        centroide[1],
+                        35,
+                        'Centroide',
+                        keynodo));
+                      numNodo++;
+                      keynodo++;
+                      print(centroide[0]);
+                    }
+                  }
                 });
               },
             )
@@ -488,7 +522,7 @@ class _HomeState extends State<Home7> {
                       });
                     },
                   ),
-                  IconButton(
+                  /*IconButton(
                     icon: Icon(Icons.auto_graph_rounded),
                     tooltip: 'Enlazar nodos',
                     color: modo == 3 ? Colors.green.shade300 : Colors.white,
@@ -497,7 +531,7 @@ class _HomeState extends State<Home7> {
                         modo = 3;
                       });
                     },
-                  ),
+                  ),*/
                   IconButton(
                     icon: Icon(Icons.delete),
                     // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
@@ -531,6 +565,20 @@ class _HomeState extends State<Home7> {
                       });
                     },
                   ),
+                  IconButton(
+                    icon: Icon(Icons.calculate), // Reemplaza "my_icon" con el icono deseado
+                    color: modo == 9 ? Colors.green.shade300 : Colors.white,
+                    onPressed: () {
+                      calcularCentroide();
+                      setState(() {
+                        showDialog(
+                            context: context,
+                            builder: (context) =>
+                                VerCentroide(nodos: vNodo, centroideC: centroide));
+                      });
+                    },
+                  ),
+
                   IconButton(
                     icon: Icon(Icons.edit_outlined),
                     // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
@@ -733,6 +781,42 @@ class _HomeState extends State<Home7> {
       print('Error al cargar los datos: $e');
     }
   }
+
+  //------------------------------Compet----------------------------------
+void calcularCentroide() {
+  data = obtenerCoordenadasNodos();
+  int k = 2;
+  centroide = findCentroid(data, k);
+  print("El centroide es: (${centroide[0]}, ${centroide[1]})");
+  print(findCentroid(data, k));
+
+}
+
+List<List<double>> obtenerCoordenadasNodos() {
+  List<List<double>> data = [];
+
+  for (var nodo in vNodo) {
+    data.add([nodo.x, nodo.y]);
+  }
+
+  return data;
+}
+
+List<double> findCentroid(List<List<double>> data, int k) {
+  List<double> centroid = List.filled(data[0].length, 0.0);
+
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].length; j++) {
+      centroid[j] += data[i][j];
+    }
+  }
+
+  for (var j = 0; j < centroid.length; j++) {
+    centroid[j] /= data.length;
+  }
+
+  return centroid;
+}
 /*
   Future<void> guardarDatos() async {
     try {
