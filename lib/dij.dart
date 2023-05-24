@@ -725,6 +725,8 @@ class HomeState8 extends State<Home8> {
     while (nodoKey != null) {
       caminoMaximo.add(nodoKey);
       nodoKey = previos[nodoKey];
+
+      print("");
     }
 
     if (caminoMaximo.isEmpty || caminoMaximo.last != inicioKey) {
