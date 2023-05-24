@@ -625,6 +625,47 @@ class HomeState8 extends State<Home8> {
                       }
                     },
                   ),
+                  IconButton(
+                    icon: Icon(Icons.data_object_outlined),
+                    color: modo == 300 ? Colors.green.shade300 : Colors.white,
+                    onPressed: () async {
+                      print('Nodos: ${vNodo.length}');
+                      print('Líneas: ${vLinea.length}');
+                      print(
+                          'Nodo de inicio seleccionado: ${nodoInicioSeleccionado.nombre}');
+
+                      print(
+                          'Nodo de destino seleccionado: ${nodoDestinoSeleccionado.nombre}');
+
+                      if (nodoInicioSeleccionado.key !=
+                          nodoDestinoSeleccionado.key) {
+                        List<int> caminoMaximo = dijkstraMaximo(
+                          nodoInicioSeleccionado.key,
+                          nodoDestinoSeleccionado.key,
+                        );
+                        print('Camino máximo: $caminoMaximo');
+                        for (int i = 0; i < caminoMaximo.length - 1; i++) {
+                          int nodo1 = caminoMaximo[i];
+                          int nodo2 = caminoMaximo[i + 1];
+
+                          for (ModeloLine linea in vLinea) {
+                            if ((linea.key == nodo1 && linea.key2 == nodo2) ||
+                                (linea.key2 == nodo1 && linea.key == nodo2)) {
+                              linea.color = Colors.red; // Nuevo color
+                            }
+                          }
+                        }
+
+                        setState(() {});
+                        Future.delayed(Duration.zero, () {
+                          mostrarCaminoOptimo(context, caminoMaximo);
+                        });
+                      } else {
+                        print(
+                            'El nodo de inicio y el nodo de destino deben ser diferentes');
+                      }
+                    },
+                  ),
                 ],
               )
             ],
@@ -632,6 +673,66 @@ class HomeState8 extends State<Home8> {
         ),
       ),
     );
+  }
+
+  List<int> dijkstraMaximo(int inicioKey, int destinoKey) {
+    Map<int, double> distancias = {};
+    Map<int, int?> previos = {};
+    List<int> nodosNoVisitados = vNodo.map((nodo) => nodo.key).toList();
+
+    for (var nodo in vNodo) {
+      distancias[nodo.key] =
+          nodo.key == inicioKey ? 0 : double.negativeInfinity;
+      previos[nodo.key] = null;
+    }
+
+    while (nodosNoVisitados.isNotEmpty) {
+      nodosNoVisitados.sort((a, b) => distancias[b]!.compareTo(distancias[
+          a]!)); // Aquí cambiamos la comparación para buscar el máximo
+      int nodoActualKey = nodosNoVisitados.removeAt(0);
+
+      if (nodoActualKey == destinoKey) {
+        break;
+      }
+
+      for (var linea in vLinea) {
+        if (linea.key == nodoActualKey) {
+          int nodoVecinoKey = linea.key2;
+
+          double distancia = distancias[nodoActualKey]! + linea.peso;
+
+          if (distancia > distancias[nodoVecinoKey]!) {
+            // Aquí cambiamos la comparación para buscar el máximo
+            distancias[nodoVecinoKey] = distancia;
+            previos[nodoVecinoKey] = nodoActualKey;
+          }
+        } else if (linea.key2 == nodoActualKey) {
+          int nodoVecinoKey = linea.key;
+
+          double distancia = distancias[nodoActualKey]! + linea.peso;
+
+          if (distancia > distancias[nodoVecinoKey]!) {
+            // Aquí cambiamos la comparación para buscar el máximo
+            distancias[nodoVecinoKey] = distancia;
+            previos[nodoVecinoKey] = nodoActualKey;
+          }
+        }
+      }
+    }
+
+    List<int> caminoMaximo = [];
+    int? nodoKey = destinoKey;
+    while (nodoKey != null) {
+      caminoMaximo.add(nodoKey);
+      nodoKey = previos[nodoKey];
+    }
+
+    if (caminoMaximo.isEmpty || caminoMaximo.last != inicioKey) {
+      print("Camino no encontrado");
+      return []; // No hay camino válido
+    }
+
+    return caminoMaximo.reversed.toList();
   }
 
   void mostrarCaminoOptimo(BuildContext context, List<int> caminoOptimo) {
