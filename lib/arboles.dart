@@ -250,22 +250,21 @@ class _Home7State extends State<Home6> {
                       setState(() {
                         comparar.sort();
                         comparar2.sort();
-                        if (preorder.length == postorder.length) {
-                          for (int i = 0; i < preorder.length; i++) {
-                            if (comparar[i] == comparar2[i]) {
-                              exact = true;
-                            } else {
-                              exact = false;
-                              break;
-                            }
+
+                        for (int i = 0; i < preorder.length; i++) {
+                          if (comparar2[i] == comparar[i]) {
+                            exact = true;
+                          } else {
+                            exact = false;
+                            break;
                           }
                         }
-
+                        print(exact);
                         if (exact) {
                           for (int i = 0; i < preorder.length; i++) {
                             objArbol.insertarNodo(preorder[i]);
                           }
-                        } else if (exact == false) {
+                        } else {
                           print("Entro");
                           showDialog(
                             context: context,
