@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'dart:math';
 
 import 'package:file_picker/_internal/file_picker_web.dart';
@@ -11,14 +12,16 @@ import 'package:path_provider/path_provider.dart';
 import 'Compet.dart';
 import 'Sorts.dart';
 import 'arboles.dart';
-import 'ayuda.dart';
+import 'ayudadijs.dart';
+
 import 'dij.dart';
 import 'figuras.dart';
 import 'home.dart';
 import 'jh.dart';
-import 'matriz.dart';
+import 'kruskal.dart';
+import 'matrizdij.dart';
 import 'modelos.dart';
-
+import 'dart:collection';
 //
 import 'dart:io';
 import 'dart:convert';
@@ -35,6 +38,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'dart:html' as html;
 import 'package:file_picker/file_picker.dart';
+import 'dart:collection';
 
 double peso = 0;
 const MethodChannel _channel = MethodChannel('com.example.gf12/saveFile');
@@ -43,10 +47,10 @@ class Home9 extends StatefulWidget {
   const Home9({Key? key}) : super(key: key);
 
   @override
-  State<Home9> createState() => _HomeState();
+  State<Home9> createState() => HomeState8();
 }
 
-class _HomeState extends State<Home9> {
+class HomeState8 extends State<Home9> {
   final nuevoNodo = TextEditingController();
   int modo = -1;
   int numNodo = 1;
@@ -56,13 +60,16 @@ class _HomeState extends State<Home9> {
   ModeloNodo nodoinicio = ModeloNodo(-1, -1, 0, "-1", -1);
   List<ModeloNodo> vNodo = [];
   List<ModeloLine> vLinea = [];
-
+  ModeloNodo nodoInicioSeleccionado = ModeloNodo(-1, -1, 0, "-1", -1);
+  ModeloNodo nodoDestinoSeleccionado = ModeloNodo(-1, -1, 0, "-1", -1);
+  ModeloLine nuevaLinea = ModeloLine(0, 0, 0, 0, 0, 0, 0, Colors.black);
+  List<int> caminoOptimo = [];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: HexColor("#F2E7D5"),
+        backgroundColor: Color(0xFFD3C8C8),
         body: Stack(
           children: [
             IconButton(
@@ -181,7 +188,7 @@ class _HomeState extends State<Home9> {
                               style: ButtonStyle(
                                 backgroundColor:
                                     MaterialStateProperty.all<Color>(
-                                        HexColor("#F2E7D5")),
+                                        Colors.white),
                               ),
                             );
                           },
@@ -256,10 +263,7 @@ class _HomeState extends State<Home9> {
                         int pos1 = buscaNodo(
                             ubi.globalPosition.dx, ubi.globalPosition.dy);
                         bool existeLinea = false;
-                        bool existeLinea2 = false;
-                        bool existeLinea3 = false;
 
-                        double xd = 20;
                         if (pos1 >= 0) {
                           int l1 = nodoinicio.key;
                           int l2 = vNodo[pos1].key;
@@ -274,17 +278,19 @@ class _HomeState extends State<Home9> {
                               vNodo[pos1].y - (35 * dy / distancia);
                           double xInicio = nodoinicio.x + (35 * dx / distancia);
                           double yInicio = nodoinicio.y + (35 * dy / distancia);
+
                           if (nodoinicio.x == -1) {
                             nodoinicio = vNodo[pos1];
                           } else {
                             if (vNodo[pos1].x == nodoinicio.x &&
                                 vNodo[pos1].y == nodoinicio.y) {
-                              // las coordenadas son iguales, crear línea que rodea el nodo
+                              // Las coordenadas son iguales, crear línea que rodea el nodo
                               double radius = 30.0;
                               double angle = atan2(nodoinicio.y - vNodo[pos1].y,
                                   nodoinicio.x - vNodo[pos1].x);
                               double x1 = nodoinicio.x + radius * cos(angle);
                               double y1 = nodoinicio.y + radius * sin(angle);
+
                               if (vNodo.isNotEmpty) {
                                 vLinea.add(ModeloLine(
                                     nodoinicio.x,
@@ -310,79 +316,21 @@ class _HomeState extends State<Home9> {
                                   break;
                                 }
                               }
-                              for (ModeloLine linea in vLinea) {
-                                if ((linea.x1 == xInicio &&
-                                        linea.y1 == yInicio &&
-                                        linea.x2 == xLlegada &&
-                                        linea.y2 ==
-                                            yLlegada) || // Nueva línea con llegada como inicio de línea existente
-                                    (linea.x2 == xInicio &&
-                                        linea.y2 == yInicio &&
-                                        linea.x1 == xLlegada &&
-                                        linea.y1 ==
-                                            yLlegada) || // Nueva línea con inicio como llegada de línea existente
-                                    (linea.x1 == xLlegada &&
-                                        linea.y1 == yLlegada &&
-                                        linea.x2 == xInicio &&
-                                        linea.y2 ==
-                                            yInicio) || // Línea existente con llegada como inicio de nueva línea
-                                    (linea.x2 == xLlegada &&
-                                        linea.y2 == yLlegada &&
-                                        linea.x1 == xInicio &&
-                                        linea.y1 == yInicio)) {
-                                  // Línea existente con inicio como llegada de nueva línea
-                                  existeLinea2 = true;
-                                  break;
-                                }
-                              }
 
-                              if (existeLinea == true) {
+                              if (!existeLinea) {
                                 vLinea.add(ModeloLine(
-                                    nodoinicio.x + xd,
-                                    nodoinicio.y + xd,
-                                    xLlegada + xd,
-                                    yLlegada + xd,
+                                    xInicio,
+                                    yInicio,
+                                    xLlegada,
+                                    yLlegada,
                                     peso,
                                     l1,
                                     l2,
-                                    Colors.blue));
-                              } else {
-                                if (existeLinea2 == true) {
-                                  vLinea.add(ModeloLine(
-                                      xLlegada + xd,
-                                      yLlegada + xd,
-                                      xInicio + xd,
-                                      yInicio + xd,
-                                      peso,
-                                      l1,
-                                      l2,
-                                      Colors.blue));
-                                } else {
-                                  if (existeLinea3 == true) {
-                                    vLinea.add(ModeloLine(
-                                        xInicio + xd,
-                                        yInicio + xd,
-                                        xLlegada + xd,
-                                        yLlegada + xd,
-                                        peso,
-                                        l1,
-                                        l2,
-                                        Colors.blue));
-                                  } else {
-                                    vLinea.add(ModeloLine(
-                                        xInicio,
-                                        yInicio,
-                                        xLlegada,
-                                        yLlegada,
-                                        peso,
-                                        l1,
-                                        l2,
-                                        Colors.black));
-                                  }
-                                }
+                                    Colors.black));
                               }
-                              nodoinicio = ModeloNodo(-1, -1, 0, "-1", -1);
                             }
+
+                            nodoinicio = ModeloNodo(-1, -1, 0, "-1", -1);
                           }
                         }
                       }
@@ -394,29 +342,33 @@ class _HomeState extends State<Home9> {
                 //mover
                 setState(() {
                   if (modo == 2) {
-                    //mover nodo
+                    // Mover nodo de inicio
                     int pos =
                         buscaNodo(ubi.globalPosition.dx, ubi.globalPosition.dy);
-                    if (pos >= 0) {
-                      double dx = ubi.globalPosition.dx - vNodo[pos].x;
-                      double dy = ubi.globalPosition.dy - vNodo[pos].y;
-                      vNodo[pos].x = ubi.globalPosition.dx;
-                      vNodo[pos].y = ubi.globalPosition.dy;
+                    setState(() {
+                      nodoInicioSeleccionado = vNodo[pos];
+                    });
 
-                      // actualizar líneas conectadas al nodo movido
-                      for (int i = 0; i < vLinea.length; i++) {
-                        if (vLinea[i].x1 == vNodo[pos].x &&
-                            vLinea[i].y1 == vNodo[pos].y) {
-                          vLinea[i].x1 += dx;
-                          vLinea[i].y1 += dy;
-                        } else if (vLinea[i].x2 == vNodo[pos].x &&
-                            vLinea[i].y2 == vNodo[pos].y) {
-                          vLinea[i].x2 += dx;
-                          vLinea[i].y2 += dy;
-                        }
-                      }
-                    }
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Alerta'),
+                          content: Text(
+                              'Nodo de inicio seleccionado: ${nodoInicioSeleccionado.nombre}'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }
+
                   if (modo == 8) {
                     //limpiar la pantalla
                   }
@@ -461,8 +413,36 @@ class _HomeState extends State<Home9> {
                           );
                         },
                       );
+                    }
+                  } else {
+                    if (modo == 400) {
+                      // Mover nodo de destino
+                      int pos = buscaNodo(
+                          ubi.globalPosition.dx, ubi.globalPosition.dy);
+                      setState(() {
+                        nodoDestinoSeleccionado = vNodo[pos];
+                      });
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Alerta'),
+                            content: Text(
+                                'Nodo de destino seleccionado: ${nodoDestinoSeleccionado.nombre}'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     } else {
-                      if (modo == 500) {}
+                      if (modo == 300) {}
                     }
                   }
                 });
@@ -585,6 +565,57 @@ class _HomeState extends State<Home9> {
                       setState(() {});
                     },
                   ),
+                  IconButton(
+                    icon: Icon(Icons.select_all_sharp),
+                    color: modo == 2 ? Colors.green.shade300 : Colors.white,
+                    onPressed: () async {
+                      setState(() {
+                        modo = 2;
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.start),
+                    color: modo == 400 ? Colors.green.shade300 : Colors.white,
+                    onPressed: () async {
+                      setState(() {
+                        modo = 400;
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.data_object_outlined),
+                    color: modo == 300 ? Colors.green.shade300 : Colors.white,
+                    onPressed: () async {
+                      print('Nodos: ${vNodo.length}');
+                      print('Líneas: ${vLinea.length}');
+                      print(
+                          'Nodo de inicio seleccionado: ${nodoInicioSeleccionado.nombre}');
+                      print(
+                          'Nodo de destino seleccionado: ${nodoDestinoSeleccionado.nombre}');
+
+                      if (nodoInicioSeleccionado.key !=
+                          nodoDestinoSeleccionado.key) {
+                        List<ModeloLine> arbolExpansionMinima =
+                            kruskal(vNodo, vLinea);
+                        print(
+                            'Arbol de expansión mínima: $arbolExpansionMinima');
+
+                        for (ModeloLine linea in arbolExpansionMinima) {
+                          linea.color = Colors.blue; // Nuevo color
+                        }
+
+                        setState(() {});
+                        Future.delayed(Duration.zero, () {
+                          mostrarArbolExpansionMinima(
+                              context, arbolExpansionMinima);
+                        });
+                      } else {
+                        print(
+                            'El nodo de inicio y el nodo de destino deben ser diferentes');
+                      }
+                    },
+                  ),
                 ],
               )
             ],
@@ -594,20 +625,242 @@ class _HomeState extends State<Home9> {
     );
   }
 
-  int buscaNodo(double x2, double y2) {
-    int pos = -1, i;
-    for (i = 0; i < vNodo.length; i++) {
-      double x1 = vNodo[i].x;
-      double y1 = vNodo[i].y;
-      double r1 = vNodo[i].radio;
-      double dist = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
-      if (dist <= r1) {
-        pos = i;
-        i = vNodo.length + 1;
+  List<ModeloLine> kruskal(List<ModeloNodo> nodos, List<ModeloLine> lineas) {
+    List<ModeloLine> arbolExpansionMinima = [];
+
+    // Ordenar las aristas por peso de menor a mayor
+    lineas.sort((a, b) => a.peso.compareTo(b.peso));
+
+    // Inicializar conjuntos disjuntos
+    List<List<int>> conjuntos = [];
+    for (int i = 0; i < nodos.length; i++) {
+      conjuntos.add([i]); // Cada nodo está en su propio conjunto
+    }
+
+    int aristasAgregadas = 0;
+    int indiceLinea = 0;
+
+    while (aristasAgregadas < nodos.length - 1) {
+      ModeloLine lineaActual = lineas[indiceLinea];
+      int nodo1 = lineaActual.key;
+      int nodo2 = lineaActual.key2;
+
+      // Verificar si los nodos están en conjuntos diferentes
+      int conjuntoNodo1 = encontrarConjunto(conjuntos, nodo1);
+      int conjuntoNodo2 = encontrarConjunto(conjuntos, nodo2);
+
+      if (conjuntoNodo1 != conjuntoNodo2) {
+        // Los nodos no forman un ciclo, se agrega la arista al árbol de expansión mínima
+        arbolExpansionMinima.add(lineaActual);
+        aristasAgregadas++;
+
+        // Unir los conjuntos de los nodos
+        union(conjuntos, conjuntoNodo1, conjuntoNodo2);
+      }
+
+      indiceLinea++;
+    }
+
+    return arbolExpansionMinima;
+  }
+
+  int encontrarConjunto(List<List<int>> conjuntos, int nodo) {
+    for (int i = 0; i < conjuntos.length; i++) {
+      if (conjuntos[i].contains(nodo)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  void union(List<List<int>> conjuntos, int conjunto1, int conjunto2) {
+    conjuntos[conjunto1].addAll(conjuntos[conjunto2]);
+    conjuntos.removeAt(conjunto2);
+  }
+
+  void mostrarArbolExpansionMinima(
+      BuildContext context, List<ModeloLine> arbolExpansionMinima) {
+    String textoArbol = arbolExpansionMinima.map((linea) {
+      ModeloNodo nodo1 = vNodo.firstWhere((nodo) => nodo.key == linea.key);
+      ModeloNodo nodo2 = vNodo.firstWhere((nodo) => nodo.key == linea.key2);
+      return '${nodo1.nombre} - ${nodo2.nombre} (${linea.peso})';
+    }).join('\n');
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Árbol de expansión mínima'),
+          content: Text(textoArbol),
+          actions: [
+            TextButton(
+              child: Text('Cerrar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<int> dijkstraMax(int inicioKey, int destinoKey) {
+    Map<int, double> distancias = {};
+    Map<int, int?> previos = {};
+    List<int> nodosNoVisitados = vNodo.map((nodo) => nodo.key).toList();
+    int maxIter = 10000; // Número máximo de iteraciones permitidas
+
+    for (var nodo in vNodo) {
+      distancias[nodo.key] =
+          nodo.key == inicioKey ? 0 : double.negativeInfinity;
+      previos[nodo.key] = null;
+    }
+
+    int iter = 0;
+    while (nodosNoVisitados.isNotEmpty) {
+      if (iter++ > maxIter) {
+        print(
+            "El cálculo se ha detenido debido a demasiadas iteraciones, puede haber un bucle infinito");
+        return []; // Termina la ejecución
+      }
+      nodosNoVisitados.sort((a, b) => distancias[b]!.compareTo(distancias[a]!));
+      int nodoActualKey = nodosNoVisitados.removeAt(0);
+
+      if (nodoActualKey == destinoKey) {
+        break;
+      }
+
+      for (var linea in vLinea) {
+        if (linea.key == nodoActualKey) {
+          int nodoVecinoKey = linea.key2;
+          double distancia = distancias[nodoActualKey]! + linea.peso;
+
+          if (distancia > distancias[nodoVecinoKey]!) {
+            distancias[nodoVecinoKey] = distancia;
+            previos[nodoVecinoKey] = nodoActualKey;
+          }
+        } else if (linea.key2 == nodoActualKey) {
+          int nodoVecinoKey = linea.key;
+          double distancia = distancias[nodoActualKey]! + linea.peso;
+
+          if (distancia > distancias[nodoVecinoKey]!) {
+            distancias[nodoVecinoKey] = distancia;
+            previos[nodoVecinoKey] = nodoActualKey;
+          }
+        }
       }
     }
 
-    return pos;
+    List<int> caminoOptimo = [];
+    int? nodoKey = destinoKey;
+    while (nodoKey != null) {
+      caminoOptimo.add(nodoKey);
+      nodoKey = previos[nodoKey];
+    }
+
+    if (caminoOptimo.isEmpty || caminoOptimo.last != inicioKey) {
+      print("Camino no encontrado");
+      return []; // No hay camino válido
+    }
+
+    return caminoOptimo.reversed.toList();
+  }
+
+  void mostrarCaminoOptimo(BuildContext context, List<int> caminoOptimo) {
+    List<ModeloNodo> nodosCamino = caminoOptimo.map((key) {
+      return vNodo.firstWhere((nodo) => nodo.key == key);
+    }).toList();
+
+    String textoCamino = nodosCamino.map((nodo) => nodo.nombre).join(" -> ");
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Camino óptimo'),
+          content: Text(textoCamino),
+          actions: [
+            TextButton(
+              child: Text('Cerrar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<int> dijkstra(int inicioKey, int destinoKey) {
+    Map<int, double> distancias = {};
+    Map<int, int?> previos = {};
+    List<int> nodosNoVisitados = vNodo.map((nodo) => nodo.key).toList();
+
+    for (var nodo in vNodo) {
+      distancias[nodo.key] = nodo.key == inicioKey ? 0 : double.infinity;
+      previos[nodo.key] = null;
+    }
+
+    while (nodosNoVisitados.isNotEmpty) {
+      nodosNoVisitados.sort((a, b) => distancias[a]!.compareTo(distancias[b]!));
+      int nodoActualKey = nodosNoVisitados.removeAt(0);
+
+      if (nodoActualKey == destinoKey) {
+        break;
+      }
+
+      for (var linea in vLinea) {
+        if (linea.key == nodoActualKey) {
+          int nodoVecinoKey = linea.key2;
+
+          double distancia = distancias[nodoActualKey]! + linea.peso;
+
+          if (distancia < distancias[nodoVecinoKey]!) {
+            distancias[nodoVecinoKey] = distancia;
+            previos[nodoVecinoKey] = nodoActualKey;
+          }
+        } else if (linea.key2 == nodoActualKey) {
+          int nodoVecinoKey = linea.key;
+
+          double distancia = distancias[nodoActualKey]! + linea.peso;
+
+          if (distancia < distancias[nodoVecinoKey]!) {
+            distancias[nodoVecinoKey] = distancia;
+            previos[nodoVecinoKey] = nodoActualKey;
+          }
+        }
+      }
+    }
+
+    List<int> caminoOptimo = [];
+    int? nodoKey = destinoKey;
+    while (nodoKey != null) {
+      caminoOptimo.add(nodoKey);
+      nodoKey = previos[nodoKey];
+    }
+
+    if (caminoOptimo.isEmpty || caminoOptimo.last != inicioKey) {
+      print("Camino no encontrado");
+      return []; // No hay camino válido
+    }
+
+    return caminoOptimo.reversed.toList();
+  }
+
+  bool _compararCoordenadas(double a, double b) {
+    final tolerancia = 0.50000; // Ajusta la tolerancia según tus necesidades
+    return (a - b).abs() < tolerancia;
+  }
+
+  int buscaNodo(double x, double y) {
+    for (int i = 0; i < vNodo.length; i++) {
+      if (vNodo[i].dentro(x, y)) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   double distanciaPuntoLinea(
@@ -732,60 +985,6 @@ class _HomeState extends State<Home9> {
       print('Error al cargar los datos: $e');
     }
   }
-/*
-  Future<void> guardarDatos() async {
-    try {
-      bool hasPermission = await requestStoragePermission();
-      if (!hasPermission) {
-        print('Permiso de almacenamiento denegado');
-        return;
-      }
-
-      final directory = await getExternalStorageDirectory();
-      final fileName = 'data_${DateTime.now().toIso8601String()}.json';
-      final filePath = '${directory!.path}/$fileName';
-      final file = File(filePath);
-
-      final data = {
-        'nodos': vNodo.map((nodo) => nodo.toJson()).toList(),
-        'lineas': vLinea.map((linea) => linea.toJson()).toList(),
-      };
-
-      final jsonData = json.encode(data);
-      await file.writeAsString(jsonData);
-
-      print('Datos guardados exitosamente');
-      print('Ruta del archivo guardado: $filePath');
-    } catch (e) {
-      print('Error al guardar los datos: $e');
-    }
-  }
-
-  Future<void> cargarDatos() async {
-    try {
-      final result = await FilePicker.platform
-          .pickFiles(type: FileType.custom, allowedExtensions: ['json']);
-
-      if (result != null) {
-        final file = File(result.files.single.path!);
-        final contents = await file.readAsString();
-        final data = json.decode(contents);
-
-        setState(() {
-          vNodo = List<ModeloNodo>.from(
-              (data['nodos'] as List).map((nodo) => ModeloNodo.fromJson(nodo)));
-          vLinea = List<ModeloLine>.from((data['lineas'] as List)
-              .map((linea) => ModeloLine.fromJson(linea)));
-        });
-
-        print('Datos cargados exitosamente');
-      } else {
-        print('No se seleccionó ningún archivo');
-      }
-    } catch (e) {
-      print('Error al cargar los datos: $e');
-    }
-  }*/
 }
 
 Widget Peso() => TextField(
@@ -796,18 +995,6 @@ Widget Peso() => TextField(
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
     );
-
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
-}
 
 //crea una funcion para crear la matriz adyacente de los nodos
 void matrizAdyacente(List<ModeloNodo> vNodo, List<ModeloLine> vLinea) {

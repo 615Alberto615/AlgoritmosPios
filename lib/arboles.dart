@@ -208,6 +208,7 @@ class _Home7State extends State<Home6> {
                 size: Size(MediaQuery.of(context).size.width, 250),
               ),
             ),
+            if (vector.length > 0) In(),
             if (preorder.length > 0) Vector(),
             if (postorder.length > 0) Order(),
           ],
@@ -251,6 +252,7 @@ class _Home7State extends State<Home6> {
                       setState(() {
                         _dato = peso;
                         objArbol.insertarNodo(_dato);
+                        vector.add(_dato);
                       });
                     },
                   ),
@@ -306,9 +308,12 @@ class _Home7State extends State<Home6> {
                     color: Colors.green.shade300,
                     onPressed: () {
                       setState(() {
+                        comparar.clear();
+                        comparar2.clear();
                         objArbol.resetArbol();
                         preorder.clear();
                         postorder.clear();
+                        vector.clear();
                       });
                     },
                   ),
@@ -374,6 +379,25 @@ Widget Alerta(BuildContext context) {
         },
       ),
     ],
+  );
+}
+
+Widget In() {
+  return Container(
+    margin: EdgeInsets.only(top: 630),
+    child: Column(
+      children: [
+        Text("Inorder"),
+        Table(border: TableBorder.all(), children: [
+          TableRow(children: [
+            for (var i = 0; i < vector.length; i++)
+              TableCell(
+                child: Text(vector[i].toString()),
+              ),
+          ])
+        ]),
+      ],
+    ),
   );
 }
 
