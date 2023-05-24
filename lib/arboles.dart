@@ -22,6 +22,7 @@ late List<int> preorder = [];
 late List<int> postorder = [];
 late List<int> comparar = [];
 late List<int> comparar2 = [];
+late List<int> vector = [];
 bool exact = false;
 
 class Home6 extends StatefulWidget {
@@ -243,11 +244,23 @@ class _Home7State extends State<Home6> {
                     },
                   ),
                   IconButton(
+                    icon: Icon(Icons.add_circle),
+                    tooltip: 'Agregar dato vector',
+                    color: Colors.green.shade300,
+                    onPressed: () {
+                      setState(() {
+                        _dato = peso;
+                        objArbol.insertarNodo(_dato);
+                      });
+                    },
+                  ),
+                  IconButton(
                     icon: Icon(Icons.build_circle),
                     tooltip: 'Crear arbol',
                     color: Colors.green.shade300,
                     onPressed: () {
                       setState(() {
+                        objArbol.resetArbol();
                         comparar.sort();
                         comparar2.sort();
 
