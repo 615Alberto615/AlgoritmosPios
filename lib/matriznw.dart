@@ -268,7 +268,7 @@ List<List<num>> northwestCornerMethod(List<num> supplies, List<num> demands,
 }
 
 //MINIMIZACION
-List<List<num>> northwestCornerMethodMinimization(
+/*List<List<num>> northwestCornerMethodMinimization(
     List<int> ofertas, List<int> demandas, List<List<int>> matriz) {
   List<List<num>> assignment = List.generate(
       ofertas.length, (index) => List.generate(demandas.length, (index) => 0));
@@ -279,6 +279,35 @@ List<List<num>> northwestCornerMethodMinimization(
   while (i < ofertas.length && j < demandas.length) {
     int minVal = min(ofertas[i], demandas[j]);
     assignment[i][j] = minVal;
+
+    ofertas[i] -= minVal;
+    demandas[j] -= minVal;
+
+    if (ofertas[i] == 0) {
+      i++;
+    } else {
+      j++;
+    }
+  }
+
+  return assignment;
+}*/
+
+List<List<num>> northwestCornerMethodMinimization(
+    List<int> ofertas, List<int> demandas, List<List<int>> matriz) {
+  List<List<num>> assignment = List.generate(
+      ofertas.length, (index) => List.generate(demandas.length, (index) => 0));
+
+  int i = 0;
+  int j = 0;
+  int m = ofertas.length;
+  int n = demandas.length;
+
+  while (i < m && j < n) {
+    int minVal = min(ofertas[i], demandas[j]);
+    assignment[i][j] = minVal;
+
+    matriz[i][j] = minVal; // Modificar el valor original de la matriz
 
     ofertas[i] -= minVal;
     demandas[j] -= minVal;

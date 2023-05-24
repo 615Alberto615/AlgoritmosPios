@@ -18,8 +18,11 @@ import 'nw.dart';
 import 'dij.dart';
 
 int peso = 0;
-List<int> preorder = [0];
-List<int> postorder = [0];
+late List<int> preorder = [];
+late List<int> postorder = [];
+late List<int> comparar = [];
+late List<int> comparar2 = [];
+bool exact = false;
 
 class Home6 extends StatefulWidget {
   const Home6({Key? key}) : super(key: key);
@@ -204,8 +207,8 @@ class _Home7State extends State<Home6> {
                 size: Size(MediaQuery.of(context).size.width, 250),
               ),
             ),
-            Vector(),
-            Order(),
+            if (preorder.length > 0) Vector(),
+            if (postorder.length > 0) Order(),
           ],
         ),
         bottomNavigationBar: BottomAppBar(
@@ -217,16 +220,58 @@ class _Home7State extends State<Home6> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.add_circle_outline),
-                    tooltip: 'Crear nodo',
+                    tooltip: 'Agregar dato',
                     color: Colors.green.shade300,
                     onPressed: () {
                       setState(() {
                         _dato = peso;
-                        objArbol.insertarNodo(_dato);
                         preorder.add(_dato);
+                        comparar2.add(_dato);
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add_circle),
+                    tooltip: 'Agregar dato postorder',
+                    color: Colors.green.shade300,
+                    onPressed: () {
+                      setState(() {
+                        _dato = peso;
                         postorder.add(_dato);
-                        Vector();
-                        Order();
+                        comparar.add(_dato);
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.build_circle),
+                    tooltip: 'Crear arbol',
+                    color: Colors.green.shade300,
+                    onPressed: () {
+                      setState(() {
+                        comparar.sort();
+                        comparar2.sort();
+                        if (preorder.length == postorder.length) {
+                          for (int i = 0; i < preorder.length; i++) {
+                            if (comparar[i] == comparar2[i]) {
+                              exact = true;
+                            } else {
+                              exact = false;
+                              break;
+                            }
+                          }
+                        }
+
+                        if (exact) {
+                          for (int i = 0; i < preorder.length; i++) {
+                            objArbol.insertarNodo(preorder[i]);
+                          }
+                        } else if (exact == false) {
+                          print("Entro");
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) => Alerta(context),
+                          );
+                        }
                       });
                     },
                   ),
@@ -250,10 +295,8 @@ class _Home7State extends State<Home6> {
                     onPressed: () {
                       setState(() {
                         objArbol.resetArbol();
-                        preorder = [0];
-                        postorder = [0];
-                        Vector();
-                        Order();
+                        preorder.clear();
+                        postorder.clear();
                       });
                     },
                   ),
@@ -287,7 +330,6 @@ Widget Vector() {
 }
 
 Widget Order() {
-  postorder.sort();
   return Container(
     margin: EdgeInsets.only(top: 630),
     child: Column(
@@ -303,6 +345,23 @@ Widget Order() {
         ]),
       ],
     ),
+  );
+}
+
+Widget Alerta(BuildContext context) {
+  return AlertDialog(
+    title: Text('Alerta de error'),
+    content: Text(
+        'Los datos de Preorder y Postorder no coinciden. Intente de nuevo, por favor.'),
+    actions: <Widget>[
+      TextButton(
+        child: Text('Aceptar'),
+        onPressed: () {
+          // Acción a realizar al hacer clic en el botón Aceptar
+          Navigator.of(context).pop(); // Cerrar el cuadro de diálogo
+        },
+      ),
+    ],
   );
 }
 
