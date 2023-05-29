@@ -64,7 +64,10 @@ class _HomeState extends State<Home3> {
   List<ModeloNodonw> vNodoD = [];
   List<ModeloLine> vLinea = [];
   List<List<int>> matriz = [];
-
+  matrizNWSolve? minimizacionWidget;
+  matrizNWSolve? maximizacionWidget;
+  double totalMinimizacion = 0;
+  double totalMaximizacion = 0;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -550,8 +553,12 @@ class _HomeState extends State<Home3> {
                       setState(() {
                         showDialog(
                             context: context,
-                            builder: (context) => matrizNW(
-                                nodosO: vNodo, nodosD: vNodoD, lineas: vLinea));
+                            builder: (context) => matrizNWSolve(
+                                  nodosO: vNodo,
+                                  nodosD: vNodoD,
+                                  lineas: vLinea,
+                                  mod: false,
+                                ));
                         print("Nort West");
                       });
                     },
