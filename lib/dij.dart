@@ -650,7 +650,7 @@ class HomeState8 extends State<Home8> {
                           for (ModeloLine linea in vLinea) {
                             if ((linea.key == nodo1 && linea.key2 == nodo2) ||
                                 (linea.key2 == nodo1 && linea.key == nodo2)) {
-                              linea.color = Colors.blue;
+                              linea.color = Colors.red;
                             }
                           }
                         }

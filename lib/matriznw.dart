@@ -58,11 +58,11 @@ class matrizNWSolve extends StatelessWidget {
       assignment =
           northwestCornerMethodMinimization(ofertas, demandas, invertedMatrix);
       calculationMatrix = invertedMatrix;
-      titulo = "Maximización";
+      titulo = "Minimización";
     } else {
       assignment = northwestCornerMethodMinimization(ofertas, demandas, matriz);
       calculationMatrix = matriz;
-      titulo = "Minimización";
+      titulo = "Maximización";
     }
 
     totalCost = calculateTotalCost(calculationMatrix, assignment);

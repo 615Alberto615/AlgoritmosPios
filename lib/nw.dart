@@ -704,7 +704,7 @@ class _HomeState extends State<Home3> {
                                 nodosO: vNodo,
                                 nodosD: vNodoD,
                                 lineas: vLinea,
-                                mod: true));
+                                mod: false));
                       });
                     },
                   ),
@@ -721,7 +721,7 @@ class _HomeState extends State<Home3> {
                                 nodosO: vNodo,
                                 nodosD: vNodoD,
                                 lineas: vLinea,
-                                mod: false));
+                                mod: true));
                       });
                     },
                   ),
