@@ -566,24 +566,6 @@ class HomeState8 extends State<Home9> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.select_all_sharp),
-                    color: modo == 2 ? Colors.green.shade300 : Colors.white,
-                    onPressed: () async {
-                      setState(() {
-                        modo = 2;
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.start),
-                    color: modo == 400 ? Colors.green.shade300 : Colors.white,
-                    onPressed: () async {
-                      setState(() {
-                        modo = 400;
-                      });
-                    },
-                  ),
-                  IconButton(
                     icon: Icon(Icons.data_object_outlined),
                     color: modo == 300 ? Colors.green.shade300 : Colors.white,
                     onPressed: () async {
@@ -594,26 +576,19 @@ class HomeState8 extends State<Home9> {
                       print(
                           'Nodo de destino seleccionado: ${nodoDestinoSeleccionado.nombre}');
 
-                      if (nodoInicioSeleccionado.key !=
-                          nodoDestinoSeleccionado.key) {
-                        List<ModeloLine> arbolExpansionMinima =
-                            kruskal(vNodo, vLinea);
-                        print(
-                            'Arbol de expansión mínima: $arbolExpansionMinima');
+                      List<ModeloLine> arbolExpansionMinima =
+                          kruskal(vNodo, vLinea);
+                      print('Arbol de expansión mínima: $arbolExpansionMinima');
 
-                        for (ModeloLine linea in arbolExpansionMinima) {
-                          linea.color = Colors.blue; // Nuevo color
-                        }
-
-                        setState(() {});
-                        Future.delayed(Duration.zero, () {
-                          mostrarArbolExpansionMinima(
-                              context, arbolExpansionMinima);
-                        });
-                      } else {
-                        print(
-                            'El nodo de inicio y el nodo de destino deben ser diferentes');
+                      for (ModeloLine linea in arbolExpansionMinima) {
+                        linea.color = Colors.blue; // Nuevo color
                       }
+
+                      setState(() {});
+                      Future.delayed(Duration.zero, () {
+                        mostrarArbolExpansionMinima(
+                            context, arbolExpansionMinima);
+                      });
                     },
                   ),
                   IconButton(
@@ -627,26 +602,20 @@ class HomeState8 extends State<Home9> {
                         print(
                             'Nodo de destino seleccionado: ${nodoDestinoSeleccionado.nombre}');
 
-                        if (nodoInicioSeleccionado.key !=
-                            nodoDestinoSeleccionado.key) {
-                          List<ModeloLine> arbolExpansionMaxima =
-                              kruskal2(vNodo, vLinea);
-                          print(
-                              'Arbol de expansión maxima: $arbolExpansionMaxima');
+                        List<ModeloLine> arbolExpansionMaxima =
+                            kruskal2(vNodo, vLinea);
+                        print(
+                            'Arbol de expansión maxima: $arbolExpansionMaxima');
 
-                          for (ModeloLine linea in arbolExpansionMaxima) {
-                            linea.color = Colors.red; // Nuevo color
-                          }
-
-                          setState(() {});
-                          Future.delayed(Duration.zero, () {
-                            mostrarArbolExpansionMaxima(
-                                context, arbolExpansionMaxima);
-                          });
-                        } else {
-                          print(
-                              'El nodo de inicio y el nodo de destino deben ser diferentes');
+                        for (ModeloLine linea in arbolExpansionMaxima) {
+                          linea.color = Colors.red; // Nuevo color
                         }
+
+                        setState(() {});
+                        Future.delayed(Duration.zero, () {
+                          mostrarArbolExpansionMaxima(
+                              context, arbolExpansionMaxima);
+                        });
                       })
                 ],
               )

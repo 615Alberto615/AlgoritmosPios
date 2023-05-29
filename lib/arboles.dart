@@ -253,6 +253,11 @@ class _Home7State extends State<Home6> {
                         _dato = peso;
                         objArbol.insertarNodo(_dato);
                         vector.add(_dato);
+                        // Actualiza los recorridos Preorder, Inorder y Postorder aquí.
+                        // Debes tener definidas las funciones correspondientes para ello en la clase Arbol.
+                        preorder = objArbol.preorderTraversal();
+                        postorder = objArbol.postorderTraversal();
+                        // Inorder ya está siendo actualizado con el método insertarNodo()
                       });
                     },
                   ),
@@ -382,9 +387,53 @@ Widget Alerta(BuildContext context) {
   );
 }
 
+Widget Post() {
+  return Container(
+    margin: EdgeInsets.only(
+        top:
+            690), // Ajusta el margen superior para evitar la superposición con los otros widgets.
+    child: Column(
+      children: [
+        Text("Postorder"),
+        Table(border: TableBorder.all(), children: [
+          TableRow(children: [
+            for (var i = 0; i < postorder.length; i++)
+              TableCell(
+                child: Text(postorder[i].toString()),
+              ),
+          ])
+        ]),
+      ],
+    ),
+  );
+}
+
+Widget Pre() {
+  return Container(
+    margin: EdgeInsets.only(
+        top:
+            660), // Ajusta el margen superior para evitar la superposición con los otros widgets.
+    child: Column(
+      children: [
+        Text("Preorder"),
+        Table(border: TableBorder.all(), children: [
+          TableRow(children: [
+            for (var i = 0; i < preorder.length; i++)
+              TableCell(
+                child: Text(preorder[i].toString()),
+              ),
+          ])
+        ]),
+      ],
+    ),
+  );
+}
+
 Widget In() {
   return Container(
-    margin: EdgeInsets.only(top: 630),
+    margin: EdgeInsets.only(
+        top:
+            670), //incrementar el valor de top para hacer espacio para el widget de Post Orden
     child: Column(
       children: [
         Text("Inorder"),

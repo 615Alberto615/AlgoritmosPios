@@ -33,4 +33,32 @@ class Arbol {
   set raiz(Nodo? n) {
     this._raiz = n;
   }
+
+  List<int> preorderTraversal() {
+    return _preorderTraversal(_raiz, []);
+  }
+
+  List<int> _preorderTraversal(Nodo? nodo, List<int> result) {
+    if (nodo == null) {
+      return result;
+    }
+    result.add(nodo.dato);
+    _preorderTraversal(nodo.izquierda, result);
+    _preorderTraversal(nodo.derecha, result);
+    return result;
+  }
+
+  List<int> postorderTraversal() {
+    return _postorderTraversal(_raiz, []);
+  }
+
+  List<int> _postorderTraversal(Nodo? nodo, List<int> result) {
+    if (nodo == null) {
+      return result;
+    }
+    _postorderTraversal(nodo.izquierda, result);
+    _postorderTraversal(nodo.derecha, result);
+    result.add(nodo.dato);
+    return result;
+  }
 }
