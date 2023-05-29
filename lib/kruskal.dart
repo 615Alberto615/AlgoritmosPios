@@ -616,6 +616,38 @@ class HomeState8 extends State<Home9> {
                       }
                     },
                   ),
+                  IconButton(
+                      icon: Icon(Icons.catching_pokemon),
+                      color: modo == 300 ? Colors.green.shade300 : Colors.white,
+                      onPressed: () async {
+                        print('Nodos: ${vNodo.length}');
+                        print('Líneas: ${vLinea.length}');
+                        print(
+                            'Nodo de inicio seleccionado: ${nodoInicioSeleccionado.nombre}');
+                        print(
+                            'Nodo de destino seleccionado: ${nodoDestinoSeleccionado.nombre}');
+
+                        if (nodoInicioSeleccionado.key !=
+                            nodoDestinoSeleccionado.key) {
+                          List<ModeloLine> arbolExpansionMaxima =
+                              kruskal2(vNodo, vLinea);
+                          print(
+                              'Arbol de expansión maxima: $arbolExpansionMaxima');
+
+                          for (ModeloLine linea in arbolExpansionMaxima) {
+                            linea.color = Colors.red; // Nuevo color
+                          }
+
+                          setState(() {});
+                          Future.delayed(Duration.zero, () {
+                            mostrarArbolExpansionMaxima(
+                                context, arbolExpansionMaxima);
+                          });
+                        } else {
+                          print(
+                              'El nodo de inicio y el nodo de destino deben ser diferentes');
+                        }
+                      })
                 ],
               )
             ],
@@ -664,6 +696,45 @@ class HomeState8 extends State<Home9> {
     return arbolExpansionMinima;
   }
 
+  List<ModeloLine> kruskal2(List<ModeloNodo> nodos, List<ModeloLine> lineas) {
+    List<ModeloLine> arbolExpansionMaxima = [];
+
+    // Ordenar las aristas por peso de menor a mayor
+    lineas.sort((a, b) => b.peso.compareTo(a.peso));
+
+    // Inicializar conjuntos disjuntos
+    List<List<int>> conjuntos = [];
+    for (int i = 0; i < nodos.length; i++) {
+      conjuntos.add([i]); // Cada nodo está en su propio conjunto
+    }
+
+    int aristasAgregadas = 0;
+    int indiceLinea = 0;
+
+    while (aristasAgregadas < nodos.length - 1) {
+      ModeloLine lineaActual = lineas[indiceLinea];
+      int nodo1 = lineaActual.key;
+      int nodo2 = lineaActual.key2;
+
+      // Verificar si los nodos están en conjuntos diferentes
+      int conjuntoNodo1 = encontrarConjunto(conjuntos, nodo1);
+      int conjuntoNodo2 = encontrarConjunto(conjuntos, nodo2);
+
+      if (conjuntoNodo1 != conjuntoNodo2) {
+        // Los nodos no forman un ciclo, se agrega la arista al árbol de expansión mínima
+        arbolExpansionMaxima.add(lineaActual);
+        aristasAgregadas++;
+
+        // Unir los conjuntos de los nodos
+        union(conjuntos, conjuntoNodo1, conjuntoNodo2);
+      }
+
+      indiceLinea++;
+    }
+
+    return arbolExpansionMaxima;
+  }
+
   int encontrarConjunto(List<List<int>> conjuntos, int nodo) {
     for (int i = 0; i < conjuntos.length; i++) {
       if (conjuntos[i].contains(nodo)) {
@@ -691,6 +762,33 @@ class HomeState8 extends State<Home9> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Árbol de expansión mínima'),
+          content: Text(textoArbol),
+          actions: [
+            TextButton(
+              child: Text('Cerrar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void mostrarArbolExpansionMaxima(
+      BuildContext context, List<ModeloLine> arbolExpansionMaxima) {
+    String textoArbol = arbolExpansionMaxima.map((linea) {
+      ModeloNodo nodo1 = vNodo.firstWhere((nodo) => nodo.key == linea.key);
+      ModeloNodo nodo2 = vNodo.firstWhere((nodo) => nodo.key == linea.key2);
+      return '${nodo1.nombre} - ${nodo2.nombre} (${linea.peso})';
+    }).join('\n');
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Árbol de expansión máxima'),
           content: Text(textoArbol),
           actions: [
             TextButton(
