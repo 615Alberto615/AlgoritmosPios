@@ -67,6 +67,7 @@ class _HomeState extends State<Home7> {
     final Size screenSize = MediaQuery.of(context).size;
     final double centerX = screenSize.width / 2;
     final double centerY = screenSize.height / 2;
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -227,9 +228,8 @@ class _HomeState extends State<Home7> {
                 ),
                 onChanged: (value) {
                   if (corX != null) {
-                    if(corX > -1){
-                      corX = value.isEmpty ? 0 : double.parse(value) + 40;
-                    }
+                    corX =
+                        value.isEmpty ? centerX : double.parse(value) + centerX;
                   }
                 },
               ),
@@ -250,9 +250,8 @@ class _HomeState extends State<Home7> {
                 ),
                 onChanged: (value) {
                   if (corY != null) {
-                    if(corY > -1){
-                      corY = value.isEmpty ? 0 : double.parse(value) + 170;
-                    }
+                    corY =
+                        value.isEmpty ? centerY : double.parse(value) + centerY;
                   }
                 },
               ),
