@@ -38,7 +38,7 @@ import 'dart:html' as html;
 import 'package:file_picker/file_picker.dart';
 
 double peso = 0;
-double corX = 40,corY = 170; //variables para las coordenadas
+double corX = 40, corY = 170; //variables para las coordenadas
 const MethodChannel _channel = MethodChannel('com.example.gf12/saveFile');
 
 class Home7 extends StatefulWidget {
@@ -49,7 +49,8 @@ class Home7 extends StatefulWidget {
 }
 
 class _HomeState extends State<Home7> {
-  List<double> centroide = []; // Variable para almacenar las coordenadas del centroide
+  List<double> centroide =
+      []; // Variable para almacenar las coordenadas del centroide
   final nuevoNodo = TextEditingController();
   int modo = -1;
   int numNodo = 1;
@@ -63,6 +64,9 @@ class _HomeState extends State<Home7> {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double centerX = screenSize.width / 2;
+    final double centerY = screenSize.height / 2;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -208,7 +212,8 @@ class _HomeState extends State<Home7> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 300.0, top: 70.0),
+              padding:
+                  const EdgeInsets.only(left: 20.0, right: 300.0, top: 70.0),
               child: TextField(
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
@@ -222,13 +227,15 @@ class _HomeState extends State<Home7> {
                 ),
                 onChanged: (value) {
                   if (corX != null) {
-                    corX = value.isEmpty ? 0 : double.parse(value) + 40;
+                    corX =
+                        value.isEmpty ? centerX : double.parse(value) + centerX;
                   }
                 },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 300.0, right: 20.0, top: 70.0),
+              padding:
+                  const EdgeInsets.only(left: 300.0, right: 20.0, top: 70.0),
               child: TextField(
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
@@ -242,7 +249,8 @@ class _HomeState extends State<Home7> {
                 ),
                 onChanged: (value) {
                   if (corY != null) {
-                    corY = value.isEmpty ? 0 : double.parse(value) + 170;
+                    corY =
+                        value.isEmpty ? centerY : double.parse(value) + centerY;
                   }
                 },
               ),
@@ -259,11 +267,7 @@ class _HomeState extends State<Home7> {
                   //agregar
                   if (modo == 1) {
                     vNodo.add(ModeloNodo(
-                        corX,
-                        corY,
-                        20,
-                        numNodo.toString(),
-                        keynodo));
+                        corX, corY, 20, numNodo.toString(), keynodo));
                     numNodo++;
                     keynodo++;
                   } else {
@@ -420,24 +424,20 @@ class _HomeState extends State<Home7> {
                             }
                           }
                         }
-                      } else{
+                      } else {
                         if (modo == 9) {
-                            // Modo 9: Dibujar nodo del centroide
-                            calcularCentroide();
-                            if (centroide.isNotEmpty) {
-                              vNodo.add(ModeloNodo(
-                                centroide[0],
-                                centroide[1],
-                                35,
-                                'Centroide',
-                                keynodo));
-                              numNodo++;
-                              keynodo++;
-                              print(centroide[0]);
-                            }
+                          // Modo 9: Dibujar nodo del centroide
+                          calcularCentroide();
+                          if (centroide.isNotEmpty) {
+                            vNodo.add(ModeloNodo(centroide[0], centroide[1], 35,
+                                'Centroide', keynodo));
+                            numNodo++;
+                            keynodo++;
+                            print(centroide[0]);
                           }
+                        }
                       }
-                    } 
+                    }
                   }
                 });
               },
@@ -520,12 +520,8 @@ class _HomeState extends State<Home7> {
                     // Modo 9: Dibujar nodo del centroide
                     calcularCentroide();
                     if (centroide.isNotEmpty) {
-                      vNodo.add(ModeloNodo(
-                        centroide[0],
-                        centroide[1],
-                        35,
-                        'Centroide',
-                        keynodo));
+                      vNodo.add(ModeloNodo(centroide[0], centroide[1], 35,
+                          'Centroide', keynodo));
                       numNodo++;
                       keynodo++;
                       print(centroide[0]);
@@ -574,19 +570,19 @@ class _HomeState extends State<Home7> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.calculate), // Reemplaza "my_icon" con el icono deseado
+                    icon: Icon(Icons
+                        .calculate), // Reemplaza "my_icon" con el icono deseado
                     color: modo == 9 ? Colors.green.shade300 : Colors.white,
                     onPressed: () {
                       calcularCentroide();
                       setState(() {
                         showDialog(
                             context: context,
-                            builder: (context) =>
-                                VerCentroide(nodos: vNodo, centroideC: centroide));
+                            builder: (context) => VerCentroide(
+                                nodos: vNodo, centroideC: centroide));
                       });
                     },
                   ),
-
                   IconButton(
                     icon: Icon(Icons.edit_outlined),
                     // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
@@ -791,40 +787,39 @@ class _HomeState extends State<Home7> {
   }
 
   //------------------------------Compet----------------------------------
-void calcularCentroide() {
-  data = obtenerCoordenadasNodos();
-  int k = 2;
-  centroide = findCentroid(data, k);
-  print("El centroide es: (${centroide[0]}, ${centroide[1]})");
-  print(findCentroid(data, k));
-
-}
-
-List<List<double>> obtenerCoordenadasNodos() {
-  List<List<double>> data = [];
-
-  for (var nodo in vNodo) {
-    data.add([nodo.x, nodo.y]);
+  void calcularCentroide() {
+    data = obtenerCoordenadasNodos();
+    int k = 2;
+    centroide = findCentroid(data, k);
+    print("El centroide es: (${centroide[0]}, ${centroide[1]})");
+    print(findCentroid(data, k));
   }
 
-  return data;
-}
+  List<List<double>> obtenerCoordenadasNodos() {
+    List<List<double>> data = [];
 
-List<double> findCentroid(List<List<double>> data, int k) {
-  List<double> centroid = List.filled(data[0].length, 0.0);
-
-  for (var i = 0; i < data.length; i++) {
-    for (var j = 0; j < data[i].length; j++) {
-      centroid[j] += data[i][j];
+    for (var nodo in vNodo) {
+      data.add([nodo.x, nodo.y]);
     }
+
+    return data;
   }
 
-  for (var j = 0; j < centroid.length; j++) {
-    centroid[j] /= data.length;
-  }
+  List<double> findCentroid(List<List<double>> data, int k) {
+    List<double> centroid = List.filled(data[0].length, 0.0);
 
-  return centroid;
-}
+    for (var i = 0; i < data.length; i++) {
+      for (var j = 0; j < data[i].length; j++) {
+        centroid[j] += data[i][j];
+      }
+    }
+
+    for (var j = 0; j < centroid.length; j++) {
+      centroid[j] /= data.length;
+    }
+
+    return centroid;
+  }
 /*
   Future<void> guardarDatos() async {
     try {
