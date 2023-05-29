@@ -222,7 +222,9 @@ class _HomeState extends State<Home7> {
                 ),
                 onChanged: (value) {
                   if (corX != null) {
-                    corX = value.isEmpty ? 0 : double.parse(value) + 40;
+                    if(corX > -1){
+                      corX = value.isEmpty ? 0 : double.parse(value) + 40;
+                    }
                   }
                 },
               ),
@@ -242,7 +244,9 @@ class _HomeState extends State<Home7> {
                 ),
                 onChanged: (value) {
                   if (corY != null) {
-                    corY = value.isEmpty ? 0 : double.parse(value) + 170;
+                    if(corY > -1){
+                      corY = value.isEmpty ? 0 : double.parse(value) + 170;
+                    }
                   }
                 },
               ),
