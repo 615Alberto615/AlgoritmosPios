@@ -38,6 +38,7 @@ import 'dart:html' as html;
 import 'package:file_picker/file_picker.dart';
 
 double peso = 0;
+double corX = 40,corY = 170; //variables para las coordenadas
 const MethodChannel _channel = MethodChannel('com.example.gf12/saveFile');
 
 class Home7 extends StatefulWidget {
@@ -197,7 +198,17 @@ class _HomeState extends State<Home7> {
               },
             ),
             Padding(
-              padding: const EdgeInsets.all(70.0),
+              padding: const EdgeInsets.all(30.0),
+              child: Text(
+                'Compet',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 300.0, top: 70.0),
               child: TextField(
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
@@ -206,12 +217,32 @@ class _HomeState extends State<Home7> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  hintText: "compet",
+                  hintText: "Coordenada X",
                   hintStyle: TextStyle(color: Colors.white),
                 ),
                 onChanged: (value) {
-                  if (peso != null) {
-                    peso = value.isEmpty ? 0 : double.parse(value);
+                  if (corX != null) {
+                    corX = value.isEmpty ? 0 : double.parse(value) + 40;
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 300.0, right: 20.0, top: 70.0),
+              child: TextField(
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.black,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  hintText: "Coordenada Y",
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
+                onChanged: (value) {
+                  if (corY != null) {
+                    corY = value.isEmpty ? 0 : double.parse(value) + 170;
                   }
                 },
               ),
@@ -228,9 +259,9 @@ class _HomeState extends State<Home7> {
                   //agregar
                   if (modo == 1) {
                     vNodo.add(ModeloNodo(
-                        ubi.globalPosition.dx,
-                        ubi.globalPosition.dy,
-                        35,
+                        corX,
+                        corY,
+                        20,
                         numNodo.toString(),
                         keynodo));
                     numNodo++;
@@ -539,29 +570,6 @@ class _HomeState extends State<Home7> {
                     onPressed: () {
                       setState(() {
                         modo = 4;
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete_sweep),
-                    // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
-                    color: modo == 5 ? Colors.green.shade300 : Colors.white,
-                    onPressed: () {
-                      setState(() {
-                        modo = 5;
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.data_array_sharp),
-                    // si el modo es 5 entonces el color del icono sera verde de lo contrario sera rojo
-                    color: modo == 6 ? Colors.green.shade300 : Colors.white,
-                    onPressed: () {
-                      setState(() {
-                        showDialog(
-                            context: context,
-                            builder: (context) =>
-                                verMatriz(nodos: vNodo, lineas: vLinea));
                       });
                     },
                   ),

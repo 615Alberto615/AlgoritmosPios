@@ -13,9 +13,9 @@ class VerCentroide extends StatelessWidget {
     List<List<String>> matrizCentroide = [];
     // Crear la matriz con las coordenadas de cada nodo
     for (var nodo in nodos) {
-      matriz.add(['${nodo.x}', '${nodo.y}']);
+      matriz.add(['${nodo.x-40}', '${nodo.y-170}']);
     }
-    matrizCentroide.add(['${centroideC[0]}','${centroideC[1]}']);
+    matrizCentroide.add(['${centroideC[0]-40}','${centroideC[1]-170}']);
 
     return AlertDialog(
       title: Text('Cálculo Algoritmo Cwompet'),
